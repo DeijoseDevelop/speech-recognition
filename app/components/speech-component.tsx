@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from '@nextui-org/button';
-import useSpeechRecognition from "@/app/hooks/use-speech-recognition";
+import useSpeechRecognition from "@/hooks/use-speech-recognition";
 import { useEffect } from "react";
 
 export default function SpeechComponent() {
