@@ -1,0 +1,18 @@
+@keyframes typing {
+  0% { width: 0 }
+  /* 50% { width: 100% } */
+  100% { width:100% }
+}
+
+.typewriter {
+  overflow: hidden;
+  border-right: .15em solid #FFF;
+  white-space: nowrap;
+  letter-spacing: .15em;
+  animation: typing 2.5s cubic-bezier(0.4, 0.0, 0.2, 0.1), blink-caret .75s step-end infinite;
+}
+
+@keyframes blink-caret {
+  from, to { border-color: transparent }
+  50% { border-color: #FFF; }
+}
