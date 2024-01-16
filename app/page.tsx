@@ -1,35 +1,25 @@
-// import SpeechComponent from "@/components/speech-component";
-// import WebcamComponent from "@/components/webcam-component";
+import HomeImage from '@/components/home/home-image';
+import Row from "@/components/row";
+import TitleText from '@/components/title-text';
 
-import LibraryBackground from "@/components/library-background";
-import TypeWriterText from "@/components/type-writer-text.tsx";
 
-export default function Home() {
+export default function HomePage() {
 
   return (
     <>
-      <LibraryBackground />
+      {/* <LibraryBackground /> */}
       {/* <SpeechComponent /> */}
       {/* <WebcamComponent /> */}
-      <div
-        style={{
-          width: "100%",
-          display: "flex",
-          justifyContent: "center",
-        }}
-      >
-        <TypeWriterText
-          text="Welcome to the Library"
-          textStyle={{
-            fontSize: 30,
-            fontWeight: "bold",
-          }}
-          parentStyle={{
-            width: "400px",
-            marginTop: 50,
-          }}
-        />
-      </div>
+      <Row
+        left={
+          <TitleText
+            title="Bienvenido a tu biblioteca"
+            text="Explora nuestras vastas colecciones digitales con la confianza de saber que esta biblioteca está diseñada pensando en ti."
+            routeToNavigate="/about"
+          />
+        }
+        right={<HomeImage />}
+      />
     </>
   );
 }
