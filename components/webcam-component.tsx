@@ -6,25 +6,34 @@ import { useRef, useCallback, useEffect, useState } from "react";
 import Webcam from "react-webcam";
 import { base64ToBlob } from "@/utils/base64-to-blob";
 import axios from "axios";
+import { useFaceRecognition } from "@/stores/use-face-recognition";
 
 export default function WebcamComponent() {
-    const [image, setImage] = useState<string | null>(null);
-    const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
+    const {
+        getImage,
+        getDevices,
+
+        setImage,
+        setImageSrc,
+        setDevices,
+    } = useFaceRecognition();
     const webcamRef = useRef<Webcam>(null);
     const URL = "http://localhost:5000/api/v1/recognition/detect/"
 
     const videoConstraints = {
-        width: 1280,
+        width: 720,
         height: 720,
         facingMode: "user"
     };
 
     const capture = async () => {
         const imageSrc: string | null = webcamRef.current!.getScreenshot();
+        setImageSrc(imageSrc);
+        console.log(getDevices());
         if (imageSrc !== null) {
-            console.log(imageSrc);
-            console.log(imageSrc?.split("base64,"));
-            console.log(imageSrc?.split("base64,")[1]!);
+            // console.log(imageSrc);
+            // console.log(imageSrc?.split("base64,"));
+            // console.log(imageSrc?.split("base64,")[1]!);
             const blob: Blob = base64ToBlob(imageSrc?.split("base64,")[1]!, "image/jpeg");
             // setImage(imageSrc);
 
@@ -34,37 +43,41 @@ export default function WebcamComponent() {
                 headers: { "x-api-key": process.env.X_API_KEY }
             });
             const json = response.data;
-            console.log(response);
-            console.log(json);
-            console.log(`data:image/jpeg;base64,${json.image}`);
+            // console.log(response);
+            // console.log(json);
+            // console.log(`data:image/jpeg;base64,${json.image}`);
             setImage(`data:image/jpeg;base64,${json.image}`);
         }
     }
 
     const handleDevices = useCallback(
         (mediaDevices: MediaDeviceInfo[]) =>
-            setDevices(mediaDevices.filter(({ kind }) => kind === "videoinput")),
+            {
+                console.log(mediaDevices);
+                setDevices(mediaDevices.filter(({ kind }) => kind === "videoinput"));
+            },
         [setDevices]
     );
 
     useEffect(
         () => {
             navigator.mediaDevices.enumerateDevices().then(handleDevices);
-            // const timer = setTimeout(capture, 3000);
+            console.log(getDevices());
+        // const timer = setTimeout(capture, 3000);
             // return () => clearTimeout(timer);
         },
-        [handleDevices]
+        [getDevices, handleDevices]
     );
 
     return (
         <>
-            {
+            {/* {
                 devices.map((device, key) => (
                     <div key={key}>
                         <Webcam
                             audio={false}
-                            width={720}
-                            height={720}
+                            width={1280}
+                            height={1280}
                             ref={webcamRef}
                             screenshotFormat="image/jpeg"
                             videoConstraints={{
@@ -74,19 +87,23 @@ export default function WebcamComponent() {
                         />
                     </div>
                 ))
-            }
+            } */}
             {
-                image !== null && image !== ""
-                    && <Image
-                        src={image}
-                        alt="Screeshot"
-                        width={0}
-                        height={0}
-                        style={{
-                            width: "100%",
-                            height: "100%",
-                        }}
-                    />
+                getDevices().length !== 0 &&
+                    <div>
+                        <Webcam
+                            className="rounded-lg"
+                            audio={false}
+                            width={480}
+                            height={720}
+                            ref={webcamRef}
+                            screenshotFormat="image/jpeg"
+                            videoConstraints={{
+                                ...videoConstraints,
+                                deviceId: getDevices()[0].deviceId
+                            }}
+                        />
+                    </div>
             }
             <Button color="primary" variant="bordered" onClick={capture}>Capture</Button>
         </>

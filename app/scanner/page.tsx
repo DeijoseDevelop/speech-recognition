@@ -1,7 +1,9 @@
-import ScannerText from '@/components/scanner/scanner-text';
-import HomeImage from '@/components/home/home-image';
 import Row from "@/components/row";
+import ScannerText from '@/components/scanner/scanner-text';
 import ScannerBackground from '@/components/scanner/scanner-background';
+import ScannerRecognition from '@/components/scanner/scanner-recognition/scanner-recognition';
+import ScannerRecognitionModalFace from '@/components/scanner/scanner-recognition/scanner-recognition-modal/scanner-recognition-modal-face';
+import ScannerRecognitionModalVoice from '@/components/scanner/scanner-recognition/scanner-recognition-modal/scanner-recognition-modal-voice';
 
 
 export default function ScannerPage() {
@@ -9,7 +11,9 @@ export default function ScannerPage() {
     return (
         <>
             <ScannerBackground />
-            <Row left={<ScannerText />} right={<HomeImage />} />
+            <ScannerRecognitionModalFace />
+            <ScannerRecognitionModalVoice />
+            <Row left={<ScannerText />} right={<ScannerRecognition />} />
         </>
     );
 }

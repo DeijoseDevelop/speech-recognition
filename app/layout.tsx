@@ -36,7 +36,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={kaisel.className}>
+      <body className={kaisel.className} style={{ overflowY: "hidden" }}>
         <Navbar />
         <UiProvider>
           {children}

@@ -13,15 +13,15 @@ export default function NextPageButton({ route }: { route: string }) {
             size="sm"
             onClick={navigateToScannerPage}
             className="
-                        text-white
-                        h-6
-                        px-5
-                        py-0
-                        rounded-md
-                        bg-gradient-to-r
-                        from-button-linear-from
-                        to-button-linear-to
-                    "
+                text-white
+                h-6
+                px-5
+                py-0
+                rounded-md
+                bg-gradient-to-r
+                from-button-linear-from
+                to-button-linear-to
+            "
         >
             Siguiente
         </Button>

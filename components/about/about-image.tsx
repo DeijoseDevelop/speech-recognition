@@ -5,7 +5,7 @@ export default function AboutImage() {
     return (
         <Image
             src={aboutImage}
-            width={1069}
+            width={969}
             height={997}
             alt="About Image"
             className="mt-30"
