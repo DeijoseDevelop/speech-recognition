@@ -9,44 +9,102 @@ import {
     ModalFooter,
     Button,
 } from "@nextui-org/react";
+import Image from "next/image";
+import { audioImage } from "@/utils/images";
+import { useVoiceRecognition } from "@/stores/use-voice-recognition";
+import Lottie from "lottie-react";
+import voiceAnimation from "@/assets/animations/voice_animation.json";
+import useSpeechRecognition from "@/hooks/use-speech-recognition";
+import { useEffect } from "react";
 
 export default function ScannerRecognitionModalVoice() {
-  const {isOpenVoice, onOpenChangeVoice} = useScannerRecognition();
+  const { isRecording, transcript, startRecording, stopRecording, hasEnded } = useSpeechRecognition();
+  const { isOpenVoice, onCloseVoice, onOpenChangeVoice } = useScannerRecognition();
+  const {
+      getIsLoading,
+      getIsFinished,
+
+      setIsLoading,
+      setIsFinished,
+
+      sendText,
+  } = useVoiceRecognition();
+
+  const capture = async () => {
+    console.log(getIsLoading());
+    console.log(getIsFinished());
+    setIsLoading(true);
+    await sendText(transcript || "Quiero un PC");
+    setIsFinished(true);
+    setIsLoading(false);
+    setTimeout(() => {
+      onCloseVoice();
+    }, 500);
+    // console.log(transcript || "Quiero un PC");
+  }
+
+  useEffect(() => {
+    if (hasEnded) capture();
+}, [isRecording, hasEnded]);
 
   return (
     <>
-      <Modal backdrop="blur" isOpen={isOpenVoice} onOpenChange={onOpenChangeVoice}>
+      <Modal
+        backdrop="blur"
+        isOpen={isOpenVoice}
+        onOpenChange={onOpenChangeVoice}
+        hideCloseButton
+      >
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="flex flex-col gap-1 text-black">Modal Title</ModalHeader>
-              <ModalBody>
-                <p className="text-black"> 
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                  Nullam pulvinar risus non risus hendrerit venenatis.
-                  Pellentesque sit amet hendrerit risus, sed porttitor quam.
-                </p>
-                <p className="text-black">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                  Nullam pulvinar risus non risus hendrerit venenatis.
-                  Pellentesque sit amet hendrerit risus, sed porttitor quam.
-                </p>
-                <p className="text-black">
-                  Magna exercitation reprehenderit magna aute tempor cupidatat consequat elit
-                  dolor adipisicing. Mollit dolor eiusmod sunt ex incididunt cillum quis. 
-                  Velit duis sit officia eiusmod Lorem aliqua enim laboris do dolor eiusmod. 
-                  Et mollit incididunt nisi consectetur esse laborum eiusmod pariatur 
-                  proident Lorem eiusmod et. Culpa deserunt nostrud ad veniam.
-                </p>
+              <ModalBody className="p-4">
+                <section className="flex flex-col gap-5">
+                  <section className="flex justify-center items-center bg-primary h-40">
+                    {
+                      !isRecording && !getIsLoading()
+                      ? <Image
+                        src={audioImage}
+                        width={380}
+                        height={280}
+                        alt="Check Image"
+                      />
+                      : <Lottie
+                        style={{ width: 350 }}
+                        animationData={voiceAnimation}
+                        loop={true}
+                      />
+                    }
+                  </section>
+                  <section className="w-full flex justify-center">
+                    <p className="text-black text-center text-sm w-8/12">
+                      {
+                        !isRecording
+                        ? `Ahora di lo que vienes a hacer.
+                          Trata de hacerlo en un tono lo suficientemente alto.`
+                        : "Ahora habla fuerte y claro."
+                      }
+                    </p>
+                  </section>
+                  <section className="w-full flex justify-center">
+                    <Button
+                      color="primary"
+                      onClick={startRecording}
+                      isDisabled={isRecording || getIsLoading()}
+                      className="
+                        rounded-md
+                        bg-gradient-to-r
+                        from-[#8600FF]
+                        to-[#2D94DA]
+                        px-10
+                        py-5
+                      "
+                    >
+                      <p className="text-2xl">Escanear</p>
+                    </Button>
+                  </section>
+                </section>
               </ModalBody>
-              <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
-                  Close
-                </Button>
-                <Button color="primary" onPress={onClose}>
-                  Action
-                </Button>
-              </ModalFooter>
             </>
           )}
         </ModalContent>

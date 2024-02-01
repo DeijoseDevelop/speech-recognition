@@ -1,7 +1,7 @@
-import { useScannerRecognitionProps } from "@/entities/scanner-recognition-props";
+import { useScannerRecognitionModalProps } from "@/entities/scanner-recognition-props";
 import { create } from "zustand";
 
-export const useScannerRecognition = create<useScannerRecognitionProps>((set, get) => ({
+export const useScannerRecognition = create<useScannerRecognitionModalProps>((set, get) => ({
     isOpenFace: false,
     defaultOpenFace: false,
     onCloseFace: () => set({ isOpenFace: false }),

@@ -13,50 +13,62 @@ import { useCallback, useEffect, useRef } from "react";
 import Webcam from "react-webcam";
 import { useFaceRecognition } from "@/stores/use-face-recognition";
 import { base64ToBlob } from "@/utils/base64-to-blob";
-import axios from "axios";
+import Lottie from "lottie-react";
+import loadingAnimation from "@/assets/animations/loading.json";
+import Image from "next/image";
+import { checkBlueImage } from "@/utils/images";
+import { SwalAlert } from "@/utils/alert";
+
 
 export default function ScannerRecognitionModalFace() {
-  const {isOpenFace, onOpenChangeFace} = useScannerRecognition();
+  const { isOpenFace, onOpenChangeFace, onCloseFace } = useScannerRecognition();
   const {
-      getImage,
       getDevices,
       getVideoConstraints,
+      getIsLoading,
+      getIsFinished,
 
-      setImage,
+      setPicture,
       setImageSrc,
       setDevices,
+      setIsLoading,
+      setIsFinished,
+
+      sendPicture,
   } = useFaceRecognition();
   const webcamRef = useRef<Webcam>(null);
-  const URL = "http://localhost:5000/api/v1/recognition/detect/";
 
   const capture = async () => {
     const imageSrc: string | null = webcamRef.current!.getScreenshot();
     setImageSrc(imageSrc);
-    console.log(getDevices());
-    if (imageSrc !== null) {
-        console.log(imageSrc);
-        // console.log(imageSrc?.split("base64,"));
-        // console.log(imageSrc?.split("base64,")[1]!);
-        const blob: Blob = base64ToBlob(imageSrc?.split("base64,")[1]!, "image/jpeg");
-        // setImage(imageSrc);
 
-        const formData: FormData = new FormData();
-        formData.append("picture", blob, "image.jpeg");
-        const response = await axios.post(URL, formData, {
-            headers: { "x-api-key": process.env.X_API_KEY }
-        });
-        const json = response.data;
-        // console.log(response);
-        console.log(json);
-        // console.log(`data:image/jpeg;base64,${json.image}`);
-        setImage(`data:image/jpeg;base64,${json.image}`);
+    if (imageSrc !== null) {
+        try {
+          const blob: Blob = base64ToBlob(imageSrc?.split("base64,")[1]!, "image/jpeg");
+          setPicture(blob);
+
+          setIsLoading(true);
+          await sendPicture();
+          setIsLoading(false);
+          setIsFinished(true);
+
+          setTimeout(() => onCloseFace(), 1000);
+        } catch (error) {
+          if (error instanceof Error) {
+            onCloseFace()
+            SwalAlert.showAlert({
+              icon: "error",
+              title: error.message,
+            });
+          }
+        }
     }
   }
 
   const handleDevices = useCallback(
     (mediaDevices: MediaDeviceInfo[]) =>
         {
-            console.log(mediaDevices);
+            // console.log(mediaDevices);
             setDevices(mediaDevices.filter(({ kind }) => kind === "videoinput"));
         },
     [setDevices]
@@ -81,31 +93,47 @@ export default function ScannerRecognitionModalFace() {
         <ModalContent>
           {(onClose) => (
             <>
-              {/* <ModalHeader className="flex flex-col gap-1 text-black">Escanear Rostro</ModalHeader> */}
               <ModalBody className="p-4">
                 <section className="flex flex-col gap-5">
                   {
-                    getDevices().length !== 0 &&
-                    <Webcam
+                    getDevices().length !== 0
+                    && !getIsLoading()
+                    && !getIsFinished()
+                    && <Webcam
                         className="rounded-lg"
                         audio={false}
                         width={480}
-                        height={720}
+                        height={480}
                         ref={webcamRef}
                         screenshotFormat="image/jpeg"
                         videoConstraints={{
                             ...getVideoConstraints(),
                             deviceId: getDevices()[0].deviceId
                         }}
-                    />
+                      />
                   }
-                  <div className="w-full flex justify-center">
+                  {
+                    getIsLoading() && !getIsFinished() &&
+                    <Lottie animationData={loadingAnimation} loop={true} />
+                  }
+                  {
+                    !getIsLoading() && getIsFinished() &&
+                    <div className="w-full h-full flex justify-center items-center p-10">
+                      <Image
+                        src={checkBlueImage}
+                        width={200}
+                        height={200}
+                        alt="Check Image"
+                      />
+                    </div>
+                  }
+                  <section className="w-full flex justify-center">
                     <p className="text-black text-center text-sm w-8/12">
                       Intenta mirar fijamente la cámara.
                       Es importante que no hagas gestos para un mejor resultado.
                     </p>
-                  </div>
-                  <div className="w-full flex justify-center">
+                  </section>
+                  <section className="w-full flex justify-center">
                     <Button
                       color="primary"
                       onClick={capture}
@@ -120,18 +148,9 @@ export default function ScannerRecognitionModalFace() {
                     >
                       <p className="text-2xl">Escanear</p>
                     </Button>
-                  </div>
+                  </section>
                 </section>
-                <section></section>
               </ModalBody>
-              {/* <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
-                  Close
-                </Button>
-                <Button color="primary" onPress={onClose}>
-                  Action
-                </Button>
-              </ModalFooter> */}
             </>
           )}
         </ModalContent>

@@ -9,11 +9,11 @@ import ScannerRecognitionModalVoice from '@/components/scanner/scanner-recogniti
 export default function ScannerPage() {
 
     return (
-        <>
+        <div className="absolute">
             <ScannerBackground />
             <ScannerRecognitionModalFace />
             <ScannerRecognitionModalVoice />
             <Row left={<ScannerText />} right={<ScannerRecognition />} />
-        </>
+        </div>
     );
 }

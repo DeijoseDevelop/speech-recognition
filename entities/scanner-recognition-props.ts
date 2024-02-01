@@ -9,19 +9,17 @@ export interface ScannerRecognitionSectionProps {
 }
 
 export interface useScannerRecognitionModalProps {
-    isOpenFace?: boolean;
+    isOpenFace: boolean;
     defaultOpenFace?: boolean;
-    onCloseFace?: () => void;
-    onOpenFace?: ()=> void;
-    onChangeFace?: (isOpen: boolean | undefined) => void;
+    onCloseFace: () => void;
+    onOpenFace: ()=> void;
+    onChangeFace: (isOpen: boolean | undefined) => void;
     onOpenChangeFace: () => void;
 
-    isOpenVoice?: boolean;
+    isOpenVoice: boolean;
     defaultOpenVoice?: boolean;
-    onCloseVoice?: () => void;
-    onOpenVoice?: ()=> void;
-    onChangeVoice?: (isOpen: boolean | undefined) => void;
+    onCloseVoice: () => void;
+    onOpenVoice: ()=> void;
+    onChangeVoice: (isOpen: boolean | undefined) => void;
     onOpenChangeVoice: () => void;
 }
-
-export interface useScannerRecognitionProps extends useScannerRecognitionModalProps {}
