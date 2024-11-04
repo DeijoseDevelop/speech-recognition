@@ -1,4 +1,4 @@
 export interface VoiceRecognitionResponse {
-    data?: string[];
+    data?: string;
     message?: string;
 }

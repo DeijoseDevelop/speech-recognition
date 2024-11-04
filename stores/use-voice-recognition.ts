@@ -59,7 +59,7 @@ export const useVoiceRecognition = create<useFaceRecognitionProps>((set, get) =>
             })
             console.log('RESPONSE');
             console.log(response);
-            const categoryRecognized: string = get().textCategories[response.data![0]]
+            const categoryRecognized: string = get().textCategories[response.data!]
             set({ categoryRecognized });
             console.log(categoryRecognized);
             console.log(get().categoryRecognized);
