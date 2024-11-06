@@ -5,11 +5,11 @@ const useSpeechRecognition = () => {
     const [isRecording, setIsRecording] = useState<boolean>(false);
     const [transcript, setTranscript] = useState<string>("");
     const [hasEnded, setHasEnded] = useState<boolean>(false);
-    const [recognition, setRecognition] = useState<SpeechRecognition | null>();
+    const [recognition, setRecognition] = useState<any | null>();
 
     useEffect(() => {
         if (typeof window !== "undefined" && 'webkitSpeechRecognition' in window) {
-            const newRec = new webkitSpeechRecognition();
+            const newRec = new (window as any).webkitSpeechRecognition();
 
             if (!recognition) {
                 setRecognition(newRec);
@@ -25,23 +25,23 @@ const useSpeechRecognition = () => {
                 console.log(rec);
             };
 
-            rec!.onresult = (event) => {
+            rec!.onresult = (event: any) => {
                 const transcriptArr = Array.from(event.results)
-                    .map(result => result[0].transcript)
+                    .map((result: any) => result[0].transcript)
                     .join('');
                 setTranscript(transcriptArr);
             };
 
-            rec!.onerror = (event) => {
+            rec!.onerror = (event: any) => {
                 console.error("Speech recognition error", event.error);
-                setRecognition(new webkitSpeechRecognition());
+                setRecognition(new (window as any).webkitSpeechRecognition());
                 setIsRecording(false);
                 setHasEnded(true);
             };
 
             rec!.onend = () => {
                 console.info("Speech recognition ended");
-                setRecognition(new webkitSpeechRecognition());
+                setRecognition(new (window as any).webkitSpeechRecognition());
                 setIsRecording(false);
                 setHasEnded(true);
             };
