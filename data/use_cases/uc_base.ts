@@ -4,8 +4,8 @@ export abstract class UseCaseNoParams<T> {
     public abstract call(): Promise<T>;
 }
 
-export abstract class UseCase<Params, T> {
-    public abstract call({ params }: { params: Params }): Promise<T>;
+export abstract class UseCase<T, Params> {
+    public abstract call({ params }: { params?: Params }): Promise<T>;
 }
 
 export class UseCaseException {

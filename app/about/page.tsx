@@ -1,6 +1,6 @@
-import Row from "@/components/row";
+import Row from "@/components/common/row";
 import AboutImage from '@/components/about/about-image';
-import TitleText from "@/components/title-text";
+import TitleText from "@/components/common/title-text";
 
 export default function AboutPage() {
     return (

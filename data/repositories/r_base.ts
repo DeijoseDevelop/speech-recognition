@@ -1,45 +1,65 @@
-import axios, { AxiosResponse } from "axios";
+import { Storage } from "@/constants/Storage"
 
 interface MethodsParams {
-    path: string;
-    body?: BodyInit;
-    headers?: Headers;
+    url?: string
+    path: string
+    body?: BodyInit
+    headers?: Headers | { Authorization: string }
 }
 
 export default class BaseRepository {
     constructor() { }
-
-    public async get({ path, headers }: MethodsParams): Promise<AxiosResponse<any, any>> {
-        let res = axios.get(`${process.env.API_URL}${path}`, {
-            headers: { "x-api-key": process.env.X_API_KEY! },
-        });
-        return res;
+    protected buildHeaders = (): Headers => {
+        return new Headers({ 'Content-Type': 'application/json' })
     }
 
-    public async post({ path, body }: MethodsParams) {
-        let res = fetch(`${process.env.API_URL}${path}`, {
-            method: "POST",
-            headers: new Headers({ "x-api-key": process.env.X_API_KEY! }),
-            body: body,
-        });
-        return res;
+    public buildHeadersWithToken = (): Headers => {
+        return new Headers({
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem(Storage.access_token) ?? ''}`
+        })
     }
 
-    public async put({ path, body }: MethodsParams) {
-        let res = fetch(`${process.env.API_URL}${path}`, {
-            method: "PUT",
-            headers: new Headers({ "x-api-key": process.env.X_API_KEY! }),
-            body: body,
-        });
-        return res;
+    public async get({ url = process.env.API_URL, path, headers }: MethodsParams): Promise<Response> {
+        let res = fetch(`${url}${path}`, {
+            method: 'GET',
+            headers: headers
+        })
+        return res
     }
 
-    public async delete({ path, body }: MethodsParams) {
-        let res = fetch(`${process.env.API_URL}${path}`, {
-            method: "DELETE",
-            headers: new Headers({ "x-api-key": process.env.X_API_KEY! }),
-            body: body,
-        });
-        return res;
+    public async post({ url = process.env.API_URL, path, body, headers }: MethodsParams) {
+        let res = fetch(`${url}${path}`, {
+            method: 'POST',
+            headers: headers,
+            body: body
+        })
+        return res
+    }
+
+    public async put({ url = process.env.API_URL, path, body, headers }: MethodsParams) {
+        let res = fetch(`${url}${path}`, {
+            method: 'PUT',
+            headers: headers,
+            body: body
+        })
+        return res
+    }
+
+    public async patch({ url = process.env.API_URL, path, body, headers }: MethodsParams) {
+        let res = fetch(`${url}${path}`, {
+            method: 'PATCH',
+            headers: headers,
+            body: body
+        })
+        return res
+    }
+
+    public async delete({ url = process.env.API_URL, path, headers }: MethodsParams) {
+        let res = fetch(`${url}${path}`, {
+            method: 'DELETE',
+            headers: headers,
+        })
+        return res
     }
 }

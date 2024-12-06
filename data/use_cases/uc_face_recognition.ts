@@ -1,7 +1,6 @@
 import { Params, UseCase, UseCaseException } from "./uc_base";
 import { FaceRecognitionRepository } from '../repositories/r_face_recognition';
 import { FaceRecognitionResponse } from "@/entities/face-recognition";
-import { AxiosResponse } from "axios";
 
 export class FaceRecognitionUseCaseParams extends Params {
     public picture: Blob;
@@ -13,7 +12,7 @@ export class FaceRecognitionUseCaseParams extends Params {
 }
 
 
-export class FaceRecognitionUseCase implements UseCase<FaceRecognitionUseCaseParams, FaceRecognitionResponse> {
+export class FaceRecognitionUseCase implements UseCase<FaceRecognitionResponse, FaceRecognitionUseCaseParams> {
     public reporisoty: FaceRecognitionRepository;
 
     constructor({ repository }: { repository: FaceRecognitionRepository }) {

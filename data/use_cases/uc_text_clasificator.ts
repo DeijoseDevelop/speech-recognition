@@ -12,7 +12,7 @@ export class VoiceRecognitionUseCaseParams extends Params {
 }
 
 
-export class VoiceRecognitionUseCase implements UseCase<VoiceRecognitionUseCaseParams, VoiceRecognitionResponse> {
+export class VoiceRecognitionUseCase implements UseCase<VoiceRecognitionResponse, VoiceRecognitionUseCaseParams> {
     public reporisoty: VoiceRecognitionRepository;
 
     constructor({ repository }: { repository: VoiceRecognitionRepository }) {

@@ -1,4 +1,4 @@
-import NextPageButton from "@/components/next-page-button";
+import NextPageButton from "@/components/common/next-page-button";
 
 interface TitleTextProps {
     title: string;
@@ -16,12 +16,12 @@ export default function TitleText({
 
     return (
         <section className="flex flex-col gap-8">
-            <h1 className={titleClassName }>{ title }</h1>
+            <h1 className={titleClassName}>{title}</h1>
             <p className="text-sm font-extralight text-black w-80">
-                { text }
+                {text}
             </p>
             <div>
-                <NextPageButton route={ routeToNavigate } />
+                <NextPageButton route={routeToNavigate} />
             </div>
         </section>
     );

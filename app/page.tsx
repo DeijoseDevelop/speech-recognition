@@ -1,6 +1,6 @@
 import HomeImage from '@/components/home/home-image';
-import Row from "@/components/row";
-import TitleText from '@/components/title-text';
+import Row from "@/components/common/row";
+import TitleText from '@/components/common/title-text';
 
 
 export default function HomePage() {

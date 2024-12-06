@@ -1,4 +1,4 @@
-import Row from "@/components/row";
+import Row from "@/components/common/row";
 import ScannerText from '@/components/scanner/scanner-text';
 import ScannerBackground from '@/components/scanner/scanner-background';
 import ScannerRecognition from '@/components/scanner/scanner-recognition/scanner-recognition';

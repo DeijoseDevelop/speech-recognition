@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import './globals.css';
-import { UiProvider } from '@/providers/ui-provider';
-import Navbar from '../components/navbar';
+import Navbar from '../components/common/navbar';
+import Providers from '@/providers/providers';
 
 const kaisel = localFont({
   src: [
@@ -38,9 +38,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={kaisel.className} style={{ overflowY: "hidden" }}>
         <Navbar />
-        <UiProvider>
+        <Providers>
           {children}
-        </UiProvider>
+        </Providers>
       </body>
     </html>
   )
