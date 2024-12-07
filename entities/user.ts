@@ -3,14 +3,14 @@ import { IngressRecord } from "./IngressRecords";
 export interface User {
     id?: number;
     name?: string;
-    lastName?: string;
-    documentNumber?: string;
+    last_name?: string;
+    document_mumber?: string;
     email?: string;
     password?: string;
     gender?: string;
-    userType?: string;
+    user_type?: string;
     dependency?: string;
-    academicProgram?: string;
-    faceEncoding?: any;
-    ingressRecords?: IngressRecord[];
+    academic_program?: string;
+    face_encoding?: any;
+    ingress_records?: IngressRecord[];
 }

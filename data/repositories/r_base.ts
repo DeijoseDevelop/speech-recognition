@@ -20,7 +20,7 @@ export default class BaseRepository {
         })
     }
 
-    public async get({ url = process.env.API_URL, path, headers }: MethodsParams): Promise<Response> {
+    public async get({ url = process.env.LOCAL_API_URL, path, headers }: MethodsParams): Promise<Response> {
         let res = fetch(`${url}${path}`, {
             method: 'GET',
             headers: headers
@@ -28,7 +28,7 @@ export default class BaseRepository {
         return res
     }
 
-    public async post({ url = process.env.API_URL, path, body, headers }: MethodsParams) {
+    public async post({ url = process.env.LOCAL_API_URL, path, body, headers }: MethodsParams) {
         let res = fetch(`${url}${path}`, {
             method: 'POST',
             headers: headers,
@@ -37,7 +37,7 @@ export default class BaseRepository {
         return res
     }
 
-    public async put({ url = process.env.API_URL, path, body, headers }: MethodsParams) {
+    public async put({ url = process.env.LOCAL_API_URL, path, body, headers }: MethodsParams) {
         let res = fetch(`${url}${path}`, {
             method: 'PUT',
             headers: headers,
@@ -46,7 +46,7 @@ export default class BaseRepository {
         return res
     }
 
-    public async patch({ url = process.env.API_URL, path, body, headers }: MethodsParams) {
+    public async patch({ url = process.env.LOCAL_API_URL, path, body, headers }: MethodsParams) {
         let res = fetch(`${url}${path}`, {
             method: 'PATCH',
             headers: headers,
@@ -55,7 +55,7 @@ export default class BaseRepository {
         return res
     }
 
-    public async delete({ url = process.env.API_URL, path, headers }: MethodsParams) {
+    public async delete({ url = process.env.LOCAL_API_URL, path, headers }: MethodsParams) {
         let res = fetch(`${url}${path}`, {
             method: 'DELETE',
             headers: headers,

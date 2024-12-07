@@ -5,13 +5,13 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { signIn, useSession } from 'next-auth/react';
-import { Button, Input, Link } from '@nextui-org/react';
+import { Button, Input } from '@nextui-org/react';
 import { LoginSchema, LoginSchemaType } from '@/schemas/loginSchema';
-// import Logo from '../common/Logo';
 import { useRouter } from 'next/navigation';
 import { SwalAlert } from '@/utils/alert';
 import { useAuth } from '@/stores/useAuth';
 import { setTimeout } from 'timers';
+import { ROUTES } from "@/config/routes";
 
 const Login = () => {
     const { login } = useAuth();

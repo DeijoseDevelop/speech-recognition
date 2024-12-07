@@ -19,9 +19,9 @@ export const useAuth = create<UseAuthProps>((set, get) => ({
             params: new LoginUseCaseParams({ ...credentials }),
         });
 
-        localStorage.setItem(Storage.access_token, response.accessToken!);
+        localStorage.setItem(Storage.access_token, response.access_token!);
 
-        return response.accessToken!;
+        return response.access_token!;
     },
     logout: async () => {
         Object.values(Storage).forEach((key) => {

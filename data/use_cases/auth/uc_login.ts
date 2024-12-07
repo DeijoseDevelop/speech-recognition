@@ -3,7 +3,7 @@ import { Params, UseCase, UseCaseException } from "../uc_base";
 import { AuthRepository } from "@/data/repositories/r_auth";
 
 export interface UserLogin {
-    accessToken?: string;
+    access_token?: string;
     error?: string;
     message?: string;
 }
