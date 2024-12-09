@@ -12,6 +12,9 @@ import { SwalAlert } from '@/utils/alert';
 import { useAuth } from '@/stores/useAuth';
 import { setTimeout } from 'timers';
 import { ROUTES } from "@/config/routes";
+import Image from 'next/image';
+import { UnicolomboLogo } from '@/utils/images';
+import Logo from '../common/Logo';
 
 const Login = () => {
     const { login } = useAuth();
@@ -28,7 +31,6 @@ const Login = () => {
     };
 
     const loginUser = async (data: LoginSchemaType) => {
-        console.log(data);
         try {
             await login({
                 email: data.email.trim(),
@@ -69,8 +71,12 @@ const Login = () => {
             <div className="absolute inset-0 bg-cover bg-center opacity-50" style={{ backgroundImage: 'url("https://lib.cmb.ac.lk/wp-content/uploads/2023/07/DSC_6658-1024x579.jpg")' }}></div>
             <div className="relative bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 z-10">
                 <div className="p-2 rounded mb-4">
-                    <div className="w-full flex justify-center">
-                        <h1 className="text-black text-2xl font-bold">Library Access</h1>
+                    <div className="h-28 flex justify-center">
+                        <Logo
+                            src={UnicolomboLogo.src}
+                            alt="Unicolombo Logo"
+                            style={{ objectFit: "cover" }}
+                        />
                     </div>
                 </div>
                 <form onSubmit={handleSubmit(onSubmit)}>

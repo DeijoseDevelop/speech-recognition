@@ -12,34 +12,25 @@ import {
     Dropdown,
     DropdownMenu,
     DropdownItem,
-    Chip,
     Pagination,
     Selection,
-    ChipProps,
     SortDescriptor,
     Select,
     SelectItem,
     User,
 } from "@nextui-org/react";
-import { VerticalDotsIcon } from "./icons/VerticalDotsIcon";
-import { ChevronDownIcon } from "./icons/ChevronDownIcon";
-import { SearchIcon } from "./icons/SearchIcon";
-import { capitalize } from "@/utils/capitalize";
+import { VerticalDotsIcon } from "../icons/VerticalDotsIcon";
+import { ChevronDownIcon } from "../icons/ChevronDownIcon";
+import { SearchIcon } from "../icons/SearchIcon";
 import Loading from "../common/Loading";
 import useDebounce from "@/hooks/useDebounce";
 import { useMutation, useQueryClient } from "react-query";
-import { UseCaseException } from "@/data/use_cases/uc_base";
 import { SwalAlert } from "@/utils/alert";
 import { ROUTES } from "@/config/routes";
 import { useRouter } from "next/navigation";
 import { useUsers } from "@/stores/users/useUsers";
 import useUserQuery from "@/stores/users/useUserQuery";
 import * as userEntities from "@/entities/user";
-
-const statusColorMap: Record<string, ChipProps["color"]> = {
-    Activo: "success",
-    Inactivo: "danger",
-};
 
 const INITIAL_VISIBLE_COLUMNS = ["Name", "email", "Status", "BusinessUnit", "actions"];
 const columns = [
@@ -48,13 +39,12 @@ const columns = [
     { name: "ACTIONS", uid: "actions" },
 ];
 
-export default function InternalUsersTable() {
+export default function ExternalUsersTable() {
     const router = useRouter();
     const [filterValue, setFilterValue] = React.useState("");
     const [selectedKeys, setSelectedKeys] = React.useState<Selection>(new Set([]));
     const [visibleColumns, setVisibleColumns] = React.useState<Selection>(new Set(INITIAL_VISIBLE_COLUMNS));
-    const [statusFilter, setStatusFilter] = React.useState<Selection>(new Set(["Activo", "Inactivo"]));
-    const [rowsPerPage, setRowsPerPage] = React.useState(5);
+    const [rowsPerPage, setRowsPerPage] = React.useState<number | 'all'>(5);
     const [sortDescriptor, setSortDescriptor] = React.useState<SortDescriptor>({
         column: "id",
         direction: "ascending",
@@ -63,58 +53,92 @@ export default function InternalUsersTable() {
 
     const debouncedSearch = useDebounce<string>(filterValue, 500);
 
-    const { } = useUsers();
-    // const { internalUsers, isLoading } = useUserQuery(debouncedSearch, page, rowsPerPage);
-    const { internalUsers, isLoading } = useUserQuery();
-    console.log(internalUsers);
+    const { deleteUser } = useUsers(); // Importamos la acción deleteUser
+    const { externalUsers, isLoading } = useUserQuery();
 
     const queryClient = useQueryClient();
-    // const mutation = useMutation(deleteAdvisor, {
-    //     onSuccess: () => {
-    //         queryClient.invalidateQueries('users');
-    //     },
-    //     onError: (error: unknown) => {
-    //         if (error instanceof UseCaseException) {
-    //             SwalAlert.showAlert({
-    //                 icon: 'error',
-    //                 title: error.message,
-    //             });
-    //         }
-    //     },
-    // });
+
+    // Mutación para eliminar el usuario
+    const deleteMutation = useMutation(
+        async (userId: number) => {
+            await deleteUser(userId);
+        },
+        {
+            onSuccess: () => {
+                SwalAlert.showAlert({ icon: "success", title: "Usuario eliminado correctamente" });
+                queryClient.invalidateQueries("external_users");
+            },
+            onError: (error: unknown) => {
+                if (error instanceof Error) {
+                    console.error(error);
+                    SwalAlert.showAlert({ icon: "error", title: error.message });
+                }
+            },
+        }
+    );
 
     const headerColumns = React.useMemo(() => {
         if (visibleColumns === "all") return columns;
-
         return columns.filter((column) => Array.from(visibleColumns).includes(column.uid));
     }, [visibleColumns]);
 
     const filteredItems = React.useMemo(() => {
-        let filteredAdvisors = internalUsers ? [...internalUsers] : [];
+        let filteredUsers = externalUsers ? [...externalUsers] : [];
 
-        return filteredAdvisors;
-    }, [internalUsers]);
+        if (debouncedSearch.trim().length > 0) {
+            const lowerFilter = debouncedSearch.toLowerCase();
+            filteredUsers = filteredUsers.filter(user =>
+                (user.name?.toLowerCase().includes(lowerFilter) ||
+                user.last_name?.toLowerCase().includes(lowerFilter) ||
+                user.email?.toLowerCase().includes(lowerFilter) ||
+                user.document_number?.toString().toLowerCase().includes(lowerFilter))
+            );
+        }
 
-    const pages = Math.ceil(internalUsers?.length ?? 0 / rowsPerPage);
+        return filteredUsers;
+    }, [externalUsers, debouncedSearch]);
 
-    const items = React.useMemo(() => {
-        return filteredItems;
-    }, [filteredItems]);
+    const totalItems = filteredItems.length;
 
-    const sortedItems = React.useMemo(() => {
-        return [...items].sort((a: userEntities.User, b: userEntities.User) => {
-            const first = a[sortDescriptor.column as keyof userEntities.User] as number;
-            const second = b[sortDescriptor.column as keyof userEntities.User] as number;
-            const cmp = first < second ? -1 : first > second ? 1 : 0;
+    const sortedAndPaginatedItems = React.useMemo(() => {
+        const sorted = [...filteredItems].sort((a, b) => {
+            const first = a[sortDescriptor.column as keyof userEntities.User] as string | number;
+            const second = b[sortDescriptor.column as keyof userEntities.User] as string | number;
+
+            let cmp = 0;
+            if (typeof first === 'number' && typeof second === 'number') {
+                cmp = first < second ? -1 : first > second ? 1 : 0;
+            } else {
+                const f = String(first).toLowerCase();
+                const s = String(second).toLowerCase();
+                cmp = f < s ? -1 : f > s ? 1 : 0;
+            }
 
             return sortDescriptor.direction === "descending" ? -cmp : cmp;
         });
-    }, [sortDescriptor, items]);
+
+        if (rowsPerPage === 'all') return sorted;
+
+        const startIndex = (page - 1) * (rowsPerPage as number);
+        const endIndex = startIndex + (rowsPerPage as number);
+        return sorted.slice(startIndex, endIndex);
+    }, [sortDescriptor, filteredItems, page, rowsPerPage]);
+
+    const pages = rowsPerPage === 'all' ? 1 : Math.ceil(totalItems / (rowsPerPage as number));
+
+    const handleDelete = async (userId: number) => {
+        const result = await SwalAlert.showOptionAlert({
+            icon: "warning",
+            title: "¿Estás seguro de eliminar este usuario?",
+            confirmButtonText: "Sí, eliminar"
+        });
+        if (result.isConfirmed) {
+            deleteMutation.mutate(userId);
+        }
+    };
 
     const renderCell = React.useCallback((user: userEntities.User, columnKey: React.Key) => {
         const cellValue = user[columnKey as keyof userEntities.User];
-        console.log(cellValue);
-        console.log(user);
 
         switch (columnKey) {
             case "Name":
@@ -130,12 +154,6 @@ export default function InternalUsersTable() {
                 );
             case "email":
                 return <p className="text-black">{user.email}</p>;
-            // case "Status":
-            //     return (
-            //         <Chip className="capitalize" color={statusColorMap[user.Status ?? "Inactivo"]} size="sm" variant="flat">
-            //             {String(cellValue)}
-            //         </Chip>
-            //     );
             case "actions":
                 return (
                     <div className="relative flex justify-end items-center gap-2">
@@ -149,16 +167,15 @@ export default function InternalUsersTable() {
                                 <DropdownItem
                                     key="Editar"
                                     value="Editar"
-                                // onClick={() => router.push(`${ROUTES.advisors.form}/${advisor.ID}`, {})}
+                                    onClick={() => router.push(`${ROUTES.externalForm}/${user.id}`)}
                                 >
                                     Editar
                                 </DropdownItem>
                                 <DropdownItem
                                     key="Eliminar"
                                     value="Eliminar"
-                                    onClick={() => {
-                                        // mutation.mutate(advisor.ID!);
-                                    }}
+                                    color="danger"
+                                    onClick={() => handleDelete(user.id!)}
                                 >
                                     Eliminar
                                 </DropdownItem>
@@ -167,9 +184,9 @@ export default function InternalUsersTable() {
                     </div>
                 );
             default:
-                return String(cellValue);
+                return String(cellValue ?? "");
         }
-    }, []);
+    }, [handleDelete, router]);
 
     const onNextPage = React.useCallback(() => {
         if (page < pages) {
@@ -184,7 +201,8 @@ export default function InternalUsersTable() {
     }, [page]);
 
     const onRowsPerPageChange = React.useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
-        setRowsPerPage(Number(e.target.value));
+        const value = e.target.value;
+        setRowsPerPage(value === 'all' ? 'all' : Number(value));
         setPage(1);
     }, []);
 
@@ -198,9 +216,9 @@ export default function InternalUsersTable() {
     }, []);
 
     const onClear = React.useCallback(() => {
-        setFilterValue("")
-        setPage(1)
-    }, [])
+        setFilterValue("");
+        setPage(1);
+    }, []);
 
     const topContent = React.useMemo(() => {
         return (
@@ -232,7 +250,7 @@ export default function InternalUsersTable() {
                             >
                                 {columns.map((column) => (
                                     <DropdownItem key={column.uid} className="capitalize">
-                                        {capitalize(column.name)}
+                                        {column.name}
                                     </DropdownItem>
                                 ))}
                             </DropdownMenu>
@@ -240,17 +258,22 @@ export default function InternalUsersTable() {
                     </div>
                 </div>
                 <div className="flex justify-between items-center">
-                    <span className="text-default-400 text-small">Total {internalUsers ? internalUsers.length : 0} usuarios</span>
+                    <span className="text-default-400 text-small">Total {totalItems} usuarios</span>
                     <Select
                         size="sm"
                         label="Usuarios por página"
                         className="w-3/5 sm:max-w-44"
-                        onChange={onRowsPerPageChange}
+                        onChange={(e) => {
+                            const value = e.target.value;
+                            setRowsPerPage(value === "all" ? "all" : Number(value));
+                            setPage(1);
+                        }}
                     >
+                        <SelectItem key={1} value={1}>1</SelectItem>
                         <SelectItem key={5} value={5}>5</SelectItem>
                         <SelectItem key={10} value={10}>10</SelectItem>
                         <SelectItem key={50} value={50}>50</SelectItem>
-                        <SelectItem key={1000000} value="all">Todos</SelectItem>
+                        <SelectItem key={"all"} value="all">Todos</SelectItem>
                     </Select>
                 </div>
             </div>
@@ -258,10 +281,9 @@ export default function InternalUsersTable() {
     }, [
         filterValue,
         onSearchChange,
-        statusFilter,
         visibleColumns,
         onRowsPerPageChange,
-        internalUsers,
+        totalItems,
         onClear,
     ]);
 
@@ -309,7 +331,6 @@ export default function InternalUsersTable() {
                 wrapper: "max-h-[382px]",
             }}
             selectedKeys={selectedKeys}
-            // selectionMode="multiple"
             sortDescriptor={sortDescriptor}
             topContent={topContent}
             topContentPlacement="outside"
@@ -327,7 +348,7 @@ export default function InternalUsersTable() {
                     </TableColumn>
                 )}
             </TableHeader>
-            <TableBody emptyContent={"No hay usuarios"} items={sortedItems}>
+            <TableBody emptyContent={"No hay usuarios"} items={sortedAndPaginatedItems}>
                 {(item) => (
                     <TableRow key={item.id!}>
                         {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}

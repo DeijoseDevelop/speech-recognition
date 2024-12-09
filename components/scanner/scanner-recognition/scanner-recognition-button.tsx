@@ -9,13 +9,17 @@ export default function ScannerRecognitionButton({ isFace = true }: { isFace: bo
     const {
         onOpenFace,
         onOpenVoice,
+        getService,
     } = useScannerRecognition();
+
+    console.log(getService());
 
     const { getImage } = useFaceRecognition();
     const { getCategoryRecognized } = useVoiceRecognition();
 
     if (isFace && getImage() !== null) {
         return <Button
+            disabled={getService() === ""}
             size="sm"
             color="primary"
             variant="bordered"
@@ -32,7 +36,8 @@ export default function ScannerRecognitionButton({ isFace = true }: { isFace: bo
         </Button>
     } else if (isFace && getImage() === null) {
         return <Button
-            onPress={isFace ? onOpenFace: onOpenVoice}
+            onPress={isFace ? onOpenFace : onOpenVoice}
+            isDisabled={getService() === ""}
             size="sm"
             color="primary"
             className="
@@ -47,45 +52,46 @@ export default function ScannerRecognitionButton({ isFace = true }: { isFace: bo
         </Button>
     }
 
-    if (!isFace && getCategoryRecognized() === null) {
-        return <Button
-            onPress={isFace ? onOpenFace: onOpenVoice}
-            size="sm"
-            color="primary"
-            className="
-                text-white
-                h-6
-                px-5
-                py-0
-                rounded-md
-            "
-        >
-            Escanear
-        </Button>
-    } else if (!isFace && getCategoryRecognized() !== null) {
-        return <Button
-            size="sm"
-            color="primary"
-            variant="bordered"
-            isDisabled
-            className="
-                text-primary
-                h-6
-                px-5
-                py-0
-                rounded-md
-            "
-        >
-            Escaneado
-        </Button>
-    }
+    // if (!isFace && getCategoryRecognized() === null) {
+    //     return <Button
+    //         onPress={isFace ? onOpenFace: onOpenVoice}
+    //         size="sm"
+    //         color="primary"
+    //         className="
+    //             text-white
+    //             h-6
+    //             px-5
+    //             py-0
+    //             rounded-md
+    //         "
+    //     >
+    //         Escanear
+    //     </Button>
+    // } else if (!isFace && getCategoryRecognized() !== null) {
+    //     return <Button
+    //         size="sm"
+    //         color="primary"
+    //         variant="bordered"
+    //         isDisabled
+    //         className="
+    //             text-primary
+    //             h-6
+    //             px-5
+    //             py-0
+    //             rounded-md
+    //         "
+    //     >
+    //         Escaneado
+    //     </Button>
+    // }
 
     return (
         <>
             {
                 !isFace
                 && <Button
-                    onPress={isFace ? onOpenFace: onOpenVoice}
+                    onPress={isFace ? onOpenFace : onOpenVoice}
+                    isDisabled={getService() === ""}
                     size="sm"
                     color="primary"
                     className="

@@ -1,7 +1,9 @@
+import { Storage } from "@/constants/Storage";
 import { FaceRecognitionRepository } from "@/data/repositories/r_face_recognition";
 import { UseCaseException } from "@/data/use_cases/uc_base";
 import { FaceRecognitionUseCase, FaceRecognitionUseCaseParams } from "@/data/use_cases/uc_face_recognition";
 import { FaceRecognitionResponse, Person } from "@/entities/face-recognition";
+import { SiteEnum } from "@/entities/IngressRecords";
 import { create } from "zustand";
 
 export interface VideoConstraints {
@@ -36,7 +38,7 @@ export interface useFaceRecognitionProps {
     setIsLoading: (isLoading: boolean) => void;
     setIsFinished: (isFinished: boolean) => void;
 
-    sendPicture: () => Promise<void>;
+    sendPicture: (site: string, service: string) => Promise<void>;
 }
 
 const faceRecognitionUseCase = new FaceRecognitionUseCase({
@@ -73,11 +75,16 @@ export const useFaceRecognition = create<useFaceRecognitionProps>((set, get) => 
     setIsLoading: (isLoading: boolean) => set({ isLoading }),
     setIsFinished: (isFinished: boolean) => set({ isFinished }),
 
-    sendPicture: async () => {
+    sendPicture: async (site: string, service: string) => {
         try {
+            const validatedSite = (site === "")
+                ? localStorage.getItem(Storage.site)
+                : site;
             const response: FaceRecognitionResponse = await faceRecognitionUseCase.call({
                 params: new FaceRecognitionUseCaseParams({
-                    picture: get().picture!
+                    picture: get().picture!,
+                    site: validatedSite ?? SiteEnum.Sede4Vientos,
+                    service,
                 })
             });
         set({

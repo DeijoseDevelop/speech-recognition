@@ -15,4 +15,12 @@ export const useScannerRecognition = create<useScannerRecognitionModalProps>((se
     onOpenVoice: () => set({ isOpenVoice: true }),
     onChangeVoice: (isOpenVoice: boolean | undefined) => set({ isOpenVoice }),
     onOpenChangeVoice: () => set((state) => ({ isOpenVoice: !state.isOpenVoice })),
+
+    site: "",
+    getSite: () => get().site,
+    setSite: (site: string) => set({ site }),
+
+    service: "",
+    getService: () => get().service,
+    setService: (service: string) => set({ service }),
 }));

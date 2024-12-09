@@ -1,11 +1,11 @@
 "use client";
 
 import Loading from '@/components/common/Loading';
-import DirectoryExternalUsers from '@/components/external/DirectoryExternalUsers';
+import ExternalUserForm from '@/components/external/form/ExternalUserForm';
 import useAuthHook from '@/hooks/useAuthHook';
 import React from 'react';
 
-const ExternalUsersPage = () => {
+const ExternalUserFormPage = () => {
     const { loading } = useAuthHook();
 
     if (loading) {
@@ -14,9 +14,9 @@ const ExternalUsersPage = () => {
 
     return (
         <>
-            <DirectoryExternalUsers />
+            <ExternalUserForm />
         </>
     );
 };
 
-export default ExternalUsersPage;
+export default ExternalUserFormPage;

@@ -8,9 +8,11 @@ export interface LogoProps {
     width?: number;
     height?: number;
     src?: string;
+    alt?: string;
+    style?: React.CSSProperties;
 }
 
-const Logo: React.FC<LogoProps> = ({ width, height, src }) => {
+const Logo: React.FC<LogoProps> = ({ width, height, src, alt, style }) => {
     const { isMobile, isTablet, isDesktop } = useResponsive();
     const [size, setSize] = useState<LogoProps>({ width: 300, height: 100 });
 
@@ -32,7 +34,8 @@ const Logo: React.FC<LogoProps> = ({ width, height, src }) => {
             height={height ?? size.height ?? 100}
             quality={50}
             priority={false}
-            alt="Logo"
+            alt={alt ?? "Logo"}
+            style={style}
         />
     );
 }

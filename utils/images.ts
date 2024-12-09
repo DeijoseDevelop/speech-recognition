@@ -7,6 +7,8 @@ import siluetaImage from "@/assets/images/Silueta_scan.png";
 import checkImage from "@/assets/images/Check.png";
 import checkBlueImage from "@/assets/images/Check_blue.png";
 import audioImage from "@/assets/images/audio.png";
+import ColomboLogo from "@/assets/images/logo-colombo.png";
+import UnicolomboLogo from "@/assets/images/logo-unicolombo.png";
 
 export {
     libraryBg,
@@ -18,4 +20,6 @@ export {
     checkImage,
     checkBlueImage,
     audioImage,
+    ColomboLogo,
+    UnicolomboLogo,
 }

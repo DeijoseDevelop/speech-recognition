@@ -12,44 +12,31 @@ import { User } from "@/entities/user";
         () => fetchUsers(true),
         {
             onSuccess: (data) => {
-                console.log(data);
-                useUsers.setState({ internalUsers: data });
+                useUsers.setState({ internalUsers: data, errorMessage: "", hasError: false });
             },
             onError: (error) => {
-                useUsers.setState({ error: error.message });
+                useUsers.setState({ errorMessage: error.message, hasError: true });
             },
         }
     );
-    console.log(queryInternal.data);
+    const queryExternal = useQuery<User[], Error>(
+        ['external_users'],
+        () => fetchUsers(false),
+        {
+            onSuccess: (data) => {
+                useUsers.setState({ externalUsers: data, errorMessage: "", hasError: false });
+            },
+            onError: (error) => {
+                useUsers.setState({ errorMessage: error.message, hasError: true });
+            },
+        }
+    );
 
-    // const queryExternal = useQuery<User[], Error>(
-    //     ['external_users'],
-    //     () => fetchUsers(false),
-    //     {
-    //         onSuccess: (data) => {
-    //             useUsers.setState({ externalUsers: data });
-    //         },
-    //         onError: (error) => {
-    //             useUsers.setState({ error: error.message });
-    //         },
-    //     }
-    // );
-
-    // const mutation = useMutation(
-    //     (advisor: Employee) => createOrUpdateAdvisor(advisor),
-    //     {
-    //         onSuccess: () => {
-    //             queryClient.invalidateQueries(['advisors']);
-    //         }
-    //     }
-    // );
-
-    // return { ...query, advisors: query.data, createOrUpdateAdvisor: mutation.mutateAsync };
     return {
         ...queryInternal,
-        // ...queryExternal,
+        ...queryExternal,
         internalUsers: queryInternal.data,
-        // externalUsers: queryExternal.data,
+        externalUsers: queryExternal.data,
     };
 };
 

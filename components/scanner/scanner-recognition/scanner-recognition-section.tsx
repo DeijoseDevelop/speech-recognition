@@ -10,7 +10,7 @@ export default function ScannerRecognitionSection({
     isFaceModal
 }: ScannerRecognitionSectionProps) {
     return (
-        <section className="w-3/6 flex flex-col justify-between items-center h-80">
+        <section className="w-3/6 flex flex-col justify-between items-center h-40">
             <div className={imageClassName ?? ""}>
                 <ScannerRecognitionImage
                     image={image}

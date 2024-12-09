@@ -38,7 +38,6 @@ const Sidebar: FC<SidebarProps> = ({ menuItems }) => {
         setIsSidebarOpen(false);
     };
 
-
     return (
         <div style={{ height: screenHeight ? `${screenHeight}px` : '100vh' }}>
             <div className="lg:hidden fixed bottom-4 right-4 z-50">

@@ -4,10 +4,14 @@ import { FaceRecognitionResponse } from "@/entities/face-recognition";
 
 export class FaceRecognitionUseCaseParams extends Params {
     public picture: Blob;
+    public site: string;
+    public service: string;
 
-    constructor({ picture }: { picture: Blob }) {
+    constructor({ picture, site, service }: { picture: Blob, site: string, service: string }) {
         super();
         this.picture = picture;
+        this.site = site;
+        this.service = service;
     }
 }
 
@@ -20,8 +24,8 @@ export class FaceRecognitionUseCase implements UseCase<FaceRecognitionResponse, 
     }
 
     public async call({ params }: { params: FaceRecognitionUseCaseParams }) {
-        const { picture } = params;
-        const response: Response = await this.reporisoty.sendPicture({ picture });
+        const { picture, site, service } = params;
+        const response: Response = await this.reporisoty.sendPicture({ picture, site, service });
         const json: FaceRecognitionResponse = await response.json();
 
         switch (response.status) {

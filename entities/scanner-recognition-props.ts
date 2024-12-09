@@ -22,4 +22,12 @@ export interface useScannerRecognitionModalProps {
     onOpenVoice: ()=> void;
     onChangeVoice: (isOpen: boolean | undefined) => void;
     onOpenChangeVoice: () => void;
+
+    site: string;
+    getSite: () => string;
+    setSite: (site: string) => void;
+
+    service: string;
+    getService: () => string;
+    setService: (service: string) => void;
 }

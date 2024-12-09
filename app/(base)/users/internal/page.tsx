@@ -1,7 +1,7 @@
 "use client";
 
 import Loading from '@/components/common/Loading';
-import DirectoryInternalUsers from '@/components/external/DirectoryInternalUsers';
+import DirectoryInternalUsers from '@/components/internal/DirectoryInternalUsers';
 import useAuthHook from '@/hooks/useAuthHook';
 
 const InternalUsersPage = () => {

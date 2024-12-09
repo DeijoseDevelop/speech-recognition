@@ -2,12 +2,12 @@
 
 import { useScannerRecognition } from "@/stores/use-scanner-recognition";
 import {
-    Modal,
-    ModalContent,
-    ModalHeader,
-    ModalBody,
-    ModalFooter,
-    Button,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Button,
 } from "@nextui-org/react";
 import { useCallback, useEffect, useRef } from "react";
 import Webcam from "react-webcam";
@@ -21,20 +21,28 @@ import { SwalAlert } from "@/utils/alert";
 
 
 export default function ScannerRecognitionModalFace() {
-  const { isOpenFace, onOpenChangeFace, onCloseFace } = useScannerRecognition();
   const {
-      getDevices,
-      getVideoConstraints,
-      getIsLoading,
-      getIsFinished,
+    isOpenFace,
+    onOpenChangeFace,
+    onCloseFace,
+    getSite,
+    getService,
+    setService,
+  } = useScannerRecognition();
+  const {
+    getDevices,
+    getVideoConstraints,
+    getIsLoading,
+    getIsFinished,
 
-      setPicture,
-      setImageSrc,
-      setDevices,
-      setIsLoading,
-      setIsFinished,
+    setPicture,
+    setImageSrc,
+    setDevices,
+    setIsLoading,
+    setIsFinished,
 
-      sendPicture,
+    sendPicture,
+    setImage,
   } = useFaceRecognition();
   const webcamRef = useRef<Webcam>(null);
 
@@ -43,43 +51,47 @@ export default function ScannerRecognitionModalFace() {
     setImageSrc(imageSrc);
 
     if (imageSrc !== null) {
-        try {
-          const blob: Blob = base64ToBlob(imageSrc?.split("base64,")[1]!, "image/jpeg");
-          setPicture(blob);
+      try {
+        const blob: Blob = base64ToBlob(imageSrc?.split("base64,")[1]!, "image/jpeg");
+        setPicture(blob);
 
-          setIsLoading(true);
-          await sendPicture();
-          setIsLoading(false);
-          setIsFinished(true);
+        setIsLoading(true);
+        await sendPicture(getSite(), getService());
+        setIsLoading(false);
+        setIsFinished(true);
 
-          setTimeout(() => onCloseFace(), 1000);
-        } catch (error) {
-          if (error instanceof Error) {
-            onCloseFace()
-            SwalAlert.showAlert({
-              icon: "error",
-              title: error.message,
-            });
-          }
+        setTimeout(() => onCloseFace(), 1000);
+        setTimeout(() => {
+          setPicture(null);
+          setImage(null);
+          setService("");
+        }, 2000);
+      } catch (error) {
+        if (error instanceof Error) {
+          onCloseFace()
+          SwalAlert.showAlert({
+            icon: "error",
+            title: error.message,
+          });
         }
+      }
     }
   }
 
   const handleDevices = useCallback(
-    (mediaDevices: MediaDeviceInfo[]) =>
-        {
-            // console.log(mediaDevices);
-            setDevices(mediaDevices.filter(({ kind }) => kind === "videoinput"));
-        },
+    (mediaDevices: MediaDeviceInfo[]) => {
+      // console.log(mediaDevices);
+      setDevices(mediaDevices.filter(({ kind }) => kind === "videoinput"));
+    },
     [setDevices]
   );
 
   useEffect(() => {
-      navigator.mediaDevices.enumerateDevices().then(handleDevices);
-      // console.log(getDevices());
-      // const timer = setTimeout(() => capture(webcamRef), 4000);
+    navigator.mediaDevices.enumerateDevices().then(handleDevices);
+    // console.log(getDevices());
+    // const timer = setTimeout(() => capture(webcamRef), 4000);
 
-      // return () => clearTimeout(timer);
+    // return () => clearTimeout(timer);
   }, [getDevices, handleDevices]);
 
   return (
@@ -100,17 +112,17 @@ export default function ScannerRecognitionModalFace() {
                     && !getIsLoading()
                     && !getIsFinished()
                     && <Webcam
-                        className="rounded-lg"
-                        audio={false}
-                        width={480}
-                        height={480}
-                        ref={webcamRef}
-                        screenshotFormat="image/jpeg"
-                        videoConstraints={{
-                            ...getVideoConstraints(),
-                            deviceId: getDevices()[0].deviceId
-                        }}
-                      />
+                      className="rounded-lg"
+                      audio={false}
+                      width={480}
+                      height={480}
+                      ref={webcamRef}
+                      screenshotFormat="image/jpeg"
+                      videoConstraints={{
+                        ...getVideoConstraints(),
+                        deviceId: getDevices()[0].deviceId
+                      }}
+                    />
                   }
                   {
                     getIsLoading() && !getIsFinished() &&

@@ -4,7 +4,7 @@ export interface User {
     id?: number;
     name?: string;
     last_name?: string;
-    document_mumber?: string;
+    document_number?: string;
     email?: string;
     password?: string;
     gender?: string;
