@@ -4,12 +4,10 @@ import { useScannerRecognition } from "@/stores/use-scanner-recognition";
 import {
   Modal,
   ModalContent,
-  ModalHeader,
   ModalBody,
-  ModalFooter,
   Button,
 } from "@nextui-org/react";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
 import { useFaceRecognition } from "@/stores/use-face-recognition";
 import { base64ToBlob } from "@/utils/base64-to-blob";
@@ -44,6 +42,7 @@ export default function ScannerRecognitionModalFace() {
     sendPicture,
     setImage,
   } = useFaceRecognition();
+
   const webcamRef = useRef<Webcam>(null);
 
   const capture = async () => {
@@ -60,11 +59,15 @@ export default function ScannerRecognitionModalFace() {
         setIsLoading(false);
         setIsFinished(true);
 
-        setTimeout(() => onCloseFace(), 1000);
+        setTimeout(() => onCloseFace(), 1000); 
+        // Limpiar el estado después de cerrar el modal
         setTimeout(() => {
           setPicture(null);
           setImage(null);
-          setService("");
+          setService(""); 
+          setImageSrc(null); 
+          setIsLoading(false);
+          setIsFinished(false);
         }, 2000);
       } catch (error) {
         if (error instanceof Error) {
@@ -80,7 +83,6 @@ export default function ScannerRecognitionModalFace() {
 
   const handleDevices = useCallback(
     (mediaDevices: MediaDeviceInfo[]) => {
-      // console.log(mediaDevices);
       setDevices(mediaDevices.filter(({ kind }) => kind === "videoinput"));
     },
     [setDevices]
@@ -88,10 +90,17 @@ export default function ScannerRecognitionModalFace() {
 
   useEffect(() => {
     navigator.mediaDevices.enumerateDevices().then(handleDevices);
-    // console.log(getDevices());
-    // const timer = setTimeout(() => capture(webcamRef), 4000);
 
-    // return () => clearTimeout(timer);
+    return () => {
+      // Detiene la transmisión de la webcam al desmontar el componente
+      if (webcamRef.current && webcamRef.current.stream) {
+        webcamRef.current.stream.getTracks().forEach(track => track.stop());
+      }
+      // Reinicia el estado al desmontar el componente
+      setImageSrc(null);
+      setIsLoading(false);
+      setIsFinished(false);
+    };
   }, [getDevices, handleDevices]);
 
   return (
